@@ -1,0 +1,152 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Enums\JobStatus;
+use App\Enums\JobPriority;
+use App\Enums\UserRole;
+use App\Http\Controllers\Controller;
+use App\Models\Job;
+use App\Models\Project;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class JobController extends Controller
+{
+    public function index()
+    {
+        $jobs = Job::with(['project.client', 'assignee', 'team'])
+            ->latest()
+            ->get();
+
+        return view('admin.jobs.index', compact('jobs'));
+    }
+
+    public function create(Project $project)
+    {
+        $crews = User::where('role', UserRole::CREW)
+                     ->where('is_active', true)
+                     ->orderBy('name')
+                     ->get();
+
+        $teams = $project->teams()->get();
+
+        return view('admin.jobs.create', compact('project', 'crews', 'teams'));
+    }
+
+    public function store(Request $request, Project $project)
+    {
+        $request->validate([
+            'title'           => 'required|string|max:200',
+            'description'     => 'nullable|string',
+            'project_team_id' => 'nullable|exists:project_teams,id',
+            'assigned_to'     => 'nullable|exists:users,id',
+            'priority'        => 'required|in:low,medium,high,urgent',
+            'deadline'        => 'nullable|date',
+            'notes'           => 'nullable|string',
+        ]);
+
+        Job::create([
+            'project_id'      => $project->id,
+            'project_team_id' => $request->project_team_id ?: null,
+            'assigned_to'     => $request->assigned_to ?: null,
+            'created_by'      => auth()->id(),
+            'title'           => $request->title,
+            'description'     => $request->description,
+            'status'          => JobStatus::TODO,
+            'priority'        => $request->priority,
+            'deadline'        => $request->deadline,
+            'notes'           => $request->notes,
+        ]);
+
+        return redirect()->route('admin.projects.show', $project)
+            ->with('success', 'Job berhasil ditambahkan.');
+    }
+
+    public function show(Job $job)
+    {
+        $job->load([
+            'project.client',
+            'assignee',
+            'team',
+            'logs.user',
+            'attachments.uploader',
+            'creator',
+        ]);
+
+        return view('admin.jobs.show', compact('job'));
+    }
+
+    public function edit(Job $job)
+    {
+        $crews = User::where('role', UserRole::CREW)
+                     ->where('is_active', true)
+                     ->orderBy('name')
+                     ->get();
+
+        $teams = $job->project->teams()->get();
+
+        return view('admin.jobs.edit', compact('job', 'crews', 'teams'));
+    }
+
+    public function update(Request $request, Job $job)
+    {
+        $request->validate([
+            'title'           => 'required|string|max:200',
+            'description'     => 'nullable|string',
+            'project_team_id' => 'nullable|exists:project_teams,id',
+            'assigned_to'     => 'nullable|exists:users,id',
+            'priority'        => 'required|in:low,medium,high,urgent',
+            'deadline'        => 'nullable|date',
+            'notes'           => 'nullable|string',
+        ]);
+
+        $job->update($request->only([
+            'title', 'description', 'project_team_id',
+            'assigned_to', 'priority', 'deadline', 'notes',
+        ]));
+
+        return redirect()->route('admin.jobs.show', $job)
+            ->with('success', 'Job berhasil diupdate.');
+    }
+
+    public function destroy(Job $job)
+    {
+        $project = $job->project;
+        $job->delete();
+
+        return redirect()->route('admin.projects.show', $project)
+            ->with('success', 'Job berhasil dihapus.');
+    }
+
+    public function updateStatus(Request $request, Job $job)
+    {
+        $request->validate([
+            'status' => 'required|in:todo,inprogress,review,done',
+        ]);
+
+        $oldStatus = $job->status->value;
+        $newStatus = $request->status;
+
+        // Auto set timestamps
+        $data = ['status' => $newStatus];
+        if ($newStatus === 'inprogress' && !$job->started_at) {
+            $data['started_at'] = now();
+        }
+        if ($newStatus === 'done' && !$job->completed_at) {
+            $data['completed_at'] = now();
+        }
+
+        $job->update($data);
+
+        // Log perubahan status
+        $job->logs()->create([
+            'user_id'    => auth()->id(),
+            'old_status' => $oldStatus,
+            'new_status' => $newStatus,
+            'note'       => $request->note,
+        ]);
+
+        return back()->with('success', 'Status job berhasil diupdate.');
+    }
+}
