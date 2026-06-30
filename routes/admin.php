@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\PortfolioController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ProjectTeamController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:admin,atasan', 'log.activity'])
@@ -49,9 +50,14 @@ Route::middleware(['auth', 'role:admin,atasan', 'log.activity'])
          ->name('projects.teams.members.destroy');
 
         // Jobs
-        Route::resource('projects.jobs', JobController::class)->shallow();
-        Route::patch('jobs/{job}/status', [JobController::class, 'updateStatus'])
-            ->name('jobs.update-status');
+        Route::get('jobs', [JobController::class, 'index'])->name('jobs.index');
+        Route::get('projects/{project}/jobs/create', [JobController::class, 'create'])->name('projects.jobs.create');
+        Route::post('projects/{project}/jobs', [JobController::class, 'store'])->name('projects.jobs.store');
+        Route::get('jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
+        Route::get('jobs/{job}/edit', [JobController::class, 'edit'])->name('jobs.edit');
+        Route::put('jobs/{job}', [JobController::class, 'update'])->name('jobs.update');
+        Route::delete('jobs/{job}', [JobController::class, 'destroy'])->name('jobs.destroy');
+        Route::patch('jobs/{job}/status', [JobController::class, 'updateStatus'])->name('jobs.update-status');
 
         // Invoices
         Route::resource('invoices', InvoiceController::class);

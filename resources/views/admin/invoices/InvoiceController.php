@@ -45,10 +45,12 @@ class InvoiceController extends Controller
 
         $project = Project::findOrFail($request->project_id);
 
+        // Generate invoice number: INV/STX/2026/001
         $year  = date('Y');
         $count = Invoice::whereYear('created_at', $year)->count() + 1;
         $invoiceNumber = 'INV/STX/' . $year . '/' . str_pad($count, 3, '0', STR_PAD_LEFT);
 
+        // Hitung subtotal dari semua items
         $subtotal = 0;
         $itemsData = [];
         foreach ($request->items as $item) {
@@ -147,9 +149,6 @@ class InvoiceController extends Controller
     {
         $invoice->load(['client', 'project', 'items']);
         $pdf = Pdf::loadView('admin.invoices.pdf', compact('invoice'));
-
-        $filename = str_replace('/', '-', $invoice->invoice_number) . '.pdf';
-
-    return $pdf->download($filename);
+        return $pdf->download($invoice->invoice_number . '.pdf');
     }
 }
