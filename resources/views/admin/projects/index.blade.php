@@ -84,9 +84,33 @@
                     <span class="text-xs text-gray-400">{{ $project->category }}</span>
                     @endif
                     @if($project->deadline)
+                    @php
+                        $daysRemaining = (int) now()->diffInDays($project->deadline, false);
+                        $isOverdue = $daysRemaining < 0 && $project->status->value !== 'done';
+                        $isDueToday = $daysRemaining === 0;
+                        $deadlineColor = match(true) {
+                            $isOverdue            => 'text-red-500',
+                            $isDueToday           => 'text-amber-600',
+                            $daysRemaining <= 3   => 'text-amber-600',
+                            default               => 'text-gray-400',
+                        };
+                        $deadlineLabel = match(true) {
+                            $isOverdue            => 'Telat ' . abs($daysRemaining) . ' hr',
+                            $isDueToday           => 'Deadline hari ini',
+                            $daysRemaining === 1  => 'Sisa 1 hari',
+                            default               => 'Sisa ' . $daysRemaining . ' hr',
+                        };
+                    @endphp
                     <span class="text-xs text-gray-300">·</span>
                     <span class="text-xs {{ $project->isOverdue() ? 'text-red-500' : 'text-gray-400' }}">
                         {{ $project->deadline->format('d M Y') }}
+                    </span>
+                    <span class="inline-flex items-center gap-0.5 text-xs font-medium {{ $deadlineColor }}">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="{{ $isOverdue ? 'M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' }}"/>
+                        </svg>
+                        {{ $deadlineLabel }}
                     </span>
                     @endif
                 </div>

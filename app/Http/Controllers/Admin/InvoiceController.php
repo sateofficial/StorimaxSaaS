@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\InvoiceStatus;
+use App\Helpers\NotificationHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Project;
@@ -132,6 +133,29 @@ class InvoiceController extends Controller
         }
 
         $invoice->update($data);
+
+        // Notifikasi ke client saat invoice dikirim atau status berubah
+        if ($request->status === 'sent') {
+            NotificationHelper::notify(
+                userId: $invoice->client->user_id,
+                type: 'invoice_sent',
+                title: 'Invoice Baru: ' . $invoice->invoice_number,
+                message: "Invoice baru untuk project {$invoice->project->name} telah diterbitkan.",
+                data: ['invoice_id' => $invoice->id, 'project_id' => $invoice->project_id],
+                actionUrl: route('client.invoices.show', $invoice),
+            );
+        }
+
+        if (in_array($request->status, ['dp_paid', 'paid'])) {
+            $statusLabel = $request->status === 'dp_paid' ? 'DP dibayar' : 'Lunas';
+            NotificationHelper::notifyAdmins(
+                type: 'invoice_' . $request->status,
+                title: "Invoice {$statusLabel}: {$invoice->invoice_number}",
+                message: "Invoice {$invoice->invoice_number} telah ditandai {$statusLabel}.",
+                data: ['invoice_id' => $invoice->id, 'project_id' => $invoice->project_id],
+                actionUrl: route('admin.invoices.show', $invoice),
+            );
+        }
 
         return back()->with('success', 'Status invoice berhasil diupdate.');
     }

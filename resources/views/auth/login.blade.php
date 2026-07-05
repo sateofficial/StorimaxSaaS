@@ -5,10 +5,10 @@
 
     {{-- Logo --}}
     <div class="text-center mb-8">
-        <h1 class="text-2xl font-semibold text-gray-900 tracking-tight">
-            Storimax
-        </h1>
-        <p class="text-sm text-gray-500 mt-1">Story in Motion. Maxed to Perfection.</p>
+        <img src="{{ asset('images/logo.png') }}"
+             alt="Storimax"
+             class="h-12 w-auto mx-auto mb-3 object-contain">
+        <p class="text-sm text-gray-500">Story in Motion. Maxed to Perfection.</p>
     </div>
 
     {{-- Card --}}

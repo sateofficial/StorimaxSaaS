@@ -2,16 +2,18 @@
     class="flex flex-col w-56 min-w-56 bg-white border-r border-gray-100 h-screen transition-all duration-200 overflow-hidden"
     x-bind:style="sidebarOpen ? 'width: 224px; min-width: 224px;' : 'width: 0; min-width: 0;'"
 >
+    @php $role = auth()->check() ? auth()->user()->role->value : 'guest'; @endphp
+
     {{-- Logo --}}
-    <div class="flex items-center h-14 px-5 border-b border-gray-100 flex-shrink-0">
-        <span class="font-semibold text-gray-900 tracking-tight">Storimax</span>
-        <span class="ml-2 text-xs text-gray-400">Admin</span>
+    <div class="flex items-center h-14 px-4 border-b border-gray-100 flex-shrink-0 gap-2">
+        <img src="{{ asset('images/logo.png') }}"
+             alt="Storimax"
+             class="h-8 w-auto object-contain">
+        <span class="text-xs text-gray-400 font-medium">{{ $role === 'client' ? 'Portal' : ucfirst($role) }}</span>
     </div>
 
     {{-- Nav --}}
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
-
-        @php $role = auth()->check() ? auth()->user()->role->value : 'guest'; @endphp
 
         {{-- Dashboard --}}
         @if(in_array($role, ['admin', 'atasan']))
@@ -105,6 +107,29 @@
                 href="{{ route('crew.jobs.index') }}"
                 icon="check-square"
                 label="My Jobs"
+            />
+        @endif
+
+        {{-- Client menu --}}
+        @if($role === 'client')
+            <div class="pt-3 pb-1 px-2">
+                <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Portal</span>
+            </div>
+
+            <x-ui.nav-item
+                href="{{ route('client.dashboard') }}"
+                icon="grid"
+                label="Dashboard"
+            />
+            <x-ui.nav-item
+                href="{{ route('client.invoices.index') }}"
+                icon="file-text"
+                label="Invoice"
+            />
+            <x-ui.nav-item
+                href="{{ route('client.portfolios.index') }}"
+                icon="image"
+                label="Portofolio"
             />
         @endif
 

@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,  // harus pertama, users butuh department
             UserSeeder::class,        // harus sebelum ClientSeeder
             ClientSeeder::class,
+            DummyDataSeeder::class,   // data dummy project + invoice
         ]);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\JobStatus;
 use App\Enums\JobPriority;
 use App\Enums\UserRole;
+use App\Helpers\NotificationHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Job;
 use App\Models\Project;
@@ -46,7 +47,7 @@ class JobController extends Controller
             'notes'           => 'nullable|string',
         ]);
 
-        Job::create([
+        $job = Job::create([
             'project_id'      => $project->id,
             'project_team_id' => $request->project_team_id ?: null,
             'assigned_to'     => $request->assigned_to ?: null,
@@ -58,6 +59,18 @@ class JobController extends Controller
             'deadline'        => $request->deadline,
             'notes'           => $request->notes,
         ]);
+
+        // Notifikasi ke crew yang diassign
+        if ($request->assigned_to) {
+            NotificationHelper::notify(
+                userId: $request->assigned_to,
+                type: 'job_assigned',
+                title: 'Job Baru: ' . $job->title,
+                message: "Kamu mendapat job baru di project {$project->name}.",
+                data: ['job_id' => $job->id, 'project_id' => $project->id],
+                actionUrl: route('crew.jobs.show', $job),
+            );
+        }
 
         return redirect()->route('admin.projects.show', $project)
             ->with('success', 'Job berhasil ditambahkan.');
@@ -146,6 +159,24 @@ class JobController extends Controller
             'new_status' => $newStatus,
             'note'       => $request->note,
         ]);
+
+        // Notifikasi ke assignee jika status berubah
+        if ($job->assigned_to && $job->assigned_to !== auth()->id()) {
+            $statusLabel = match($newStatus) {
+                'inprogress' => 'In Progress',
+                'review'     => 'Review',
+                'done'       => 'Done',
+                default      => ucfirst($newStatus),
+            };
+            NotificationHelper::notify(
+                userId: $job->assigned_to,
+                type: 'job_status_' . $newStatus,
+                title: 'Job diupdate ke ' . $statusLabel,
+                message: 'Status job "' . $job->title . '" diubah menjadi ' . $statusLabel . '.',
+                data: ['job_id' => $job->id, 'project_id' => $job->project_id],
+                actionUrl: route('crew.jobs.show', $job),
+            );
+        }
 
         return back()->with('success', 'Status job berhasil diupdate.');
     }
