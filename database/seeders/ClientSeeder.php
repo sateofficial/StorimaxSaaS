@@ -48,8 +48,14 @@ class ClientSeeder extends Seeder
         ];
 
         foreach ($clients as $data) {
-            $user = User::create($data['user']);
-            Client::create(array_merge($data['client'], ['user_id' => $user->id]));
+            $user = User::firstOrCreate(
+                ['email' => $data['user']['email']],
+                $data['user']
+            );
+            Client::firstOrCreate(
+                ['user_id' => $user->id],
+                $data['client']
+            );
         }
     }
 }

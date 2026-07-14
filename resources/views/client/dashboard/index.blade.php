@@ -59,7 +59,7 @@
                    class="text-sm font-medium text-gray-900 hover:text-blue-600 transition">
                     {{ $invoice->invoice_number }}
                 </a>
-                <p class="text-xs text-gray-400 mt-0.5">{{ $invoice->project->name }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{ $invoice->project?->name ?? '—' }}</p>
             </div>
             <div class="text-right flex-shrink-0">
                 <p class="text-sm font-medium text-gray-900">

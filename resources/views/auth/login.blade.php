@@ -8,7 +8,6 @@
         <img src="{{ asset('images/logo.png') }}"
              alt="Storimax"
              class="h-12 w-auto mx-auto mb-3 object-contain">
-        <p class="text-sm text-gray-500">Story in Motion. Maxed to Perfection.</p>
     </div>
 
     {{-- Card --}}

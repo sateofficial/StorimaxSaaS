@@ -6,7 +6,6 @@ use App\Enums\InvoiceStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\UserRole;
 use App\Models\Client;
-use App\Models\Department;
 use App\Models\Invoice;
 use App\Models\Project;
 use App\Models\User;
@@ -25,10 +24,7 @@ class InvoiceControllerTest extends TestCase
     {
         parent::setUp();
 
-        $dept = Department::create(['name' => 'Finance', 'slug' => 'finance']);
-
         $this->admin = User::factory()->create([
-            'department_id' => $dept->id,
             'name' => 'Admin Keuangan',
             'email' => 'finance@test.com',
             'role' => UserRole::ADMIN,
@@ -36,7 +32,6 @@ class InvoiceControllerTest extends TestCase
         ]);
 
         $clientUser = User::factory()->create([
-            'department_id' => $dept->id,
             'name' => 'Client Inv',
             'email' => 'clientinv@test.com',
             'role' => UserRole::CLIENT,

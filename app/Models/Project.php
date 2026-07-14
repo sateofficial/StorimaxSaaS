@@ -36,6 +36,23 @@ class Project extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (self $project) {
+            // Cascade soft-delete: jobs, invoices, portfolios
+            foreach ($project->jobs as $job) {
+                $job->attachments()->delete(); // JobAttachment ikut terhapus
+                $job->logs()->delete();        // JobLog ikut terhapus
+                $job->delete();                // Soft-delete job
+            }
+            foreach ($project->invoices as $invoice) {
+                $invoice->items()->delete(); // InvoiceItem ikut terhapus
+                $invoice->delete();           // Soft-delete invoice
+            }
+            $project->portfolios()->delete();
+        });
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
@@ -44,11 +61,6 @@ class Project extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function teams(): HasMany
-    {
-        return $this->hasMany(ProjectTeam::class);
     }
 
     public function jobs(): HasMany

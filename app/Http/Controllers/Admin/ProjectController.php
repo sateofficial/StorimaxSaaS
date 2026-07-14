@@ -15,7 +15,7 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::with(['client', 'creator', 'teams'])
+        $projects = Project::with(['client', 'creator'])
             ->latest()
             ->get();
 
@@ -46,9 +46,16 @@ class ProjectController extends Controller
         ]);
 
         // Generate kode project otomatis: STX-2026-001
-        $year  = date('Y');
-        $count = Project::whereYear('created_at', $year)->count() + 1;
-        $code  = 'STX-' . $year . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+        $year   = date('Y');
+        $prefix = 'STX-' . $year . '-';
+
+        // Cari nomor urut TERTINGGI yang sudah ada (abaikan soft-delete & gap)
+        $maxCode = Project::where('code', 'like', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING(code, -3) AS UNSIGNED) DESC')
+            ->value('code');
+
+        $number = $maxCode ? ((int) substr($maxCode, -3)) + 1 : 1;
+        $code   = $prefix . str_pad($number, 3, '0', STR_PAD_LEFT);
 
         $project = Project::create([
             'client_id'   => $request->client_id,
@@ -72,17 +79,10 @@ class ProjectController extends Controller
         $project->load([
             'client.user',
             'creator',
-            'teams.pic',
-            'teams.members.user.department',
             'jobs.assignee',
         ]);
 
-        $crews = User::where('role', UserRole::CREW)
-                     ->where('is_active', true)
-                     ->orderBy('name')
-                     ->get();
-
-        return view('admin.projects.show', compact('project', 'crews'));
+        return view('admin.projects.show', compact('project'));
     }
 
     public function edit(Project $project)

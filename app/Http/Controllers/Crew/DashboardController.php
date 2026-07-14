@@ -26,8 +26,9 @@ class DashboardController extends Controller
             ->where('status', JobStatus::DONE)
             ->count();
 
-        $recentJobs = Job::with(['project', 'team'])
+        $recentJobs = Job::with('project')
             ->where('assigned_to', $userId)
+            ->whereIn('status', [JobStatus::TODO, JobStatus::INPROGRESS, JobStatus::REVIEW])
             ->latest()
             ->take(5)
             ->get();

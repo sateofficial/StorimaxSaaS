@@ -5,7 +5,6 @@ namespace Tests\Feature\Admin;
 use App\Enums\ProjectStatus;
 use App\Enums\UserRole;
 use App\Models\Client;
-use App\Models\Department;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,10 +22,7 @@ class ProjectControllerTest extends TestCase
     {
         parent::setUp();
 
-        $dept = Department::create(['name' => 'Creative', 'slug' => 'creative']);
-
         $this->admin = User::factory()->create([
-            'department_id' => $dept->id,
             'name' => 'Admin Utama',
             'email' => 'admin@test.com',
             'role' => UserRole::ADMIN,
@@ -34,7 +30,6 @@ class ProjectControllerTest extends TestCase
         ]);
 
         $this->crew = User::factory()->create([
-            'department_id' => $dept->id,
             'name' => 'Crew Test',
             'email' => 'crew@test.com',
             'role' => UserRole::CREW,
@@ -42,7 +37,6 @@ class ProjectControllerTest extends TestCase
         ]);
 
         $clientUser = User::factory()->create([
-            'department_id' => $dept->id,
             'name' => 'Client User',
             'email' => 'clientuser@test.com',
             'role' => UserRole::CLIENT,

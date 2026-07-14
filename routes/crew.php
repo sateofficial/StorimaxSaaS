@@ -18,11 +18,7 @@ Route::middleware(['auth', 'role:crew', 'log.activity'])
         Route::get('jobs', [JobController::class, 'index'])->name('jobs.index');
         Route::get('jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
 
-        // Progress update
+        // Update status
         Route::patch('jobs/{job}/status', [ProgressController::class, 'updateStatus'])
             ->name('jobs.update-status');
-        Route::post('jobs/{job}/attachments', [ProgressController::class, 'uploadAttachment'])
-            ->name('jobs.attachments.upload');
-        Route::delete('jobs/{job}/attachments/{attachment}', [ProgressController::class, 'deleteAttachment'])
-            ->name('jobs.attachments.delete');
     });

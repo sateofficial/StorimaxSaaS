@@ -54,7 +54,7 @@
 {{-- Crew Performance Table --}}
 <div class="bg-white rounded-xl border border-gray-100 overflow-hidden mb-6">
     <div class="px-5 py-4 border-b border-gray-50">
-        <h3 class="text-sm font-semibold text-gray-900">Performa Crew</h3>
+        <h3 class="text-sm font-medium text-gray-900">Performa Crew</h3>
     </div>
 
     @if($crewMembers->isEmpty())
@@ -63,16 +63,15 @@
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
-                <tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wider">
-                    <th class="px-5 py-3 font-medium">Crew</th>
-                    <th class="px-5 py-3 font-medium">Departemen</th>
-                    <th class="px-5 py-3 font-medium text-center">Total</th>
-                    <th class="px-5 py-3 font-medium text-center">To Do</th>
-                    <th class="px-5 py-3 font-medium text-center">In Progress</th>
-                    <th class="px-5 py-3 font-medium text-center">Review</th>
-                    <th class="px-5 py-3 font-medium text-center">Done</th>
-                    <th class="px-5 py-3 font-medium text-center">Rate</th>
-                    <th class="px-5 py-3 font-medium text-right">Aksi</th>
+                <tr class="bg-gray-50 text-left">
+                    <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Crew</th>
+                    <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Total</th>
+                    <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">To Do</th>
+                    <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">In Progress</th>
+                    <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Review</th>
+                    <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Done</th>
+                    <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Rate</th>
+                    <th class="px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-right">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
@@ -95,7 +94,6 @@
                             <span class="font-medium text-gray-900">{{ $crew->name }}</span>
                         </div>
                     </td>
-                    <td class="px-5 py-3 text-gray-500">{{ $crew->department?->name ?? '—' }}</td>
                     <td class="px-5 py-3 text-center font-medium">{{ $crew->jobs_count }}</td>
                     <td class="px-5 py-3 text-center text-gray-400">{{ $crew->todo_count }}</td>
                     <td class="px-5 py-3 text-center text-blue-600 font-medium">{{ $crew->inprogress_count }}</td>
@@ -116,32 +114,5 @@
     @endif
 </div>
 
-{{-- Department Summary --}}
-<div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
-    <div class="px-5 py-4 border-b border-gray-50">
-        <h3 class="text-sm font-semibold text-gray-900">Rekap per Departemen</h3>
-    </div>
-    @if($departments->isNotEmpty())
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-            <thead>
-                <tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wider">
-                    <th class="px-5 py-3 font-medium">Departemen</th>
-                    <th class="px-5 py-3 font-medium text-center">Jumlah Crew</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-                @foreach($departments as $dept)
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-5 py-3 font-medium text-gray-900">{{ $dept->name }}</td>
-                    <td class="px-5 py-3 text-center text-gray-600">{{ $dept->users_count }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @else
-        <div class="py-10 text-center text-sm text-gray-400">Belum ada departemen.</div>
-    @endif
-</div>
+
 @endsection

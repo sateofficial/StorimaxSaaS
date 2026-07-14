@@ -7,6 +7,9 @@
     <title>{{ config('app.name') }} — @yield('title', 'Dashboard')</title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}?v=2">
     <link rel="shortcut icon" href="{{ asset('favicon.png') }}?v=2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50 text-gray-900 antialiased" x-data="{ sidebarOpen: true }">

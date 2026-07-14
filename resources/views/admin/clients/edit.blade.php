@@ -27,6 +27,30 @@
                               focus:outline-none focus:ring-2 focus:ring-gray-900">
             </div>
 
+            {{-- Info Akun Login (hanya admin yang lihat) --}}
+            <div class="bg-gray-50 rounded-lg p-4 space-y-4 border border-gray-100">
+                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Informasi Akun Login</h4>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Email (untuk login)</label>
+                    <input type="email" name="email" value="{{ old('email', $client->user->email) }}"
+                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
+                                  focus:outline-none focus:ring-2 focus:ring-gray-900">
+                    @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">
+                        Password Baru
+                        <span class="text-gray-400 font-normal">(kosongkan jika tidak diubah)</span>
+                    </label>
+                    <input type="password" name="password" placeholder="Min. 8 karakter"
+                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
+                                  focus:outline-none focus:ring-2 focus:ring-gray-900">
+                    @error('password') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">No. Telepon</label>
                 <input type="text" name="phone" value="{{ old('phone', $client->phone) }}"

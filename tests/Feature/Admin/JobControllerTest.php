@@ -7,10 +7,8 @@ use App\Enums\JobStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\UserRole;
 use App\Models\Client;
-use App\Models\Department;
 use App\Models\Job;
 use App\Models\Project;
-use App\Models\ProjectTeam;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -23,16 +21,12 @@ class JobControllerTest extends TestCase
     private User $crew;
     private Client $client;
     private Project $project;
-    private ProjectTeam $team;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $dept = Department::create(['name' => 'Production', 'slug' => 'production']);
-
         $this->admin = User::factory()->create([
-            'department_id' => $dept->id,
             'name' => 'Admin Produksi',
             'email' => 'produksi@test.com',
             'role' => UserRole::ADMIN,
@@ -40,7 +34,6 @@ class JobControllerTest extends TestCase
         ]);
 
         $this->crew = User::factory()->create([
-            'department_id' => $dept->id,
             'name' => 'Crew Jhon',
             'email' => 'jhon@test.com',
             'role' => UserRole::CREW,
@@ -48,7 +41,6 @@ class JobControllerTest extends TestCase
         ]);
 
         $clientUser = User::factory()->create([
-            'department_id' => $dept->id,
             'name' => 'Client Job',
             'email' => 'clientjob@test.com',
             'role' => UserRole::CLIENT,
@@ -72,11 +64,7 @@ class JobControllerTest extends TestCase
             'priority' => 'medium',
         ]);
 
-        $this->team = ProjectTeam::create([
-            'project_id' => $this->project->id,
-            'team_name' => 'Tim Kreatif',
-            'pic_user_id' => $this->crew->id,
-        ]);
+        // Team feature removed — assign per user langsung
 
         $this->actingAs($this->admin);
     }
@@ -98,7 +86,6 @@ class JobControllerTest extends TestCase
         $response = $this->get(route('admin.projects.jobs.create', $this->project));
 
         $response->assertStatus(200);
-        $response->assertSee('Tim Kreatif');
         $response->assertSee('Crew Jhon');
     }
 
@@ -108,7 +95,6 @@ class JobControllerTest extends TestCase
         $response = $this->post(route('admin.projects.jobs.store', $this->project), $this->withCsrf([
             'title' => 'Job Baru',
             'description' => 'Deskripsi job baru',
-            'project_team_id' => $this->team->id,
             'assigned_to' => $this->crew->id,
             'priority' => 'high',
             'deadline' => '2026-08-15',
@@ -122,7 +108,6 @@ class JobControllerTest extends TestCase
             'project_id' => $this->project->id,
             'title' => 'Job Baru',
             'assigned_to' => $this->crew->id,
-            'project_team_id' => $this->team->id,
             'status' => JobStatus::TODO->value,
             'priority' => JobPriority::HIGH->value,
             'created_by' => $this->admin->id,
@@ -360,7 +345,6 @@ class JobControllerTest extends TestCase
     {
         return Job::create([
             'project_id' => $this->project->id,
-            'project_team_id' => $this->team->id,
             'assigned_to' => $this->crew->id,
             'created_by' => $this->admin->id,
             'title' => 'Job Utama',

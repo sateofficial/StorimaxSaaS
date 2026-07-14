@@ -55,20 +55,6 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Department</label>
-                    <select name="department_id"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
-                                   focus:outline-none focus:ring-2 focus:ring-gray-900">
-                        <option value="">Tanpa department</option>
-                        @foreach($departments as $dept)
-                        <option value="{{ $dept->id }}" {{ old('department_id') === $dept->id ? 'selected' : '' }}>
-                            {{ $dept->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">No. Telepon</label>
                     <input type="text" name="phone" value="{{ old('phone') }}"
                            placeholder="08xxxxxxxxxx"
@@ -106,12 +92,18 @@
 
                     {{-- Avatar + info --}}
                     <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
+                        @if($user->avatar)
+                        <img src="{{ asset('storage/' . $user->avatar) }}"
+                             alt="{{ $user->name }}"
+                             class="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-gray-200">
+                        @else
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0
                                     {{ $user->is_active ? 'bg-gray-900' : 'bg-gray-300' }}">
                             <span class="text-xs font-medium text-white">
                                 {{ strtoupper(substr($user->name, 0, 1)) }}
                             </span>
                         </div>
+                        @endif
                         <div class="min-w-0">
                             <div class="flex items-center gap-2">
                                 <p class="text-sm font-medium text-gray-900 truncate">{{ $user->name }}</p>
@@ -138,11 +130,7 @@
                         <span class="text-xs px-2 py-0.5 rounded-full font-medium {{ $roleColor }}">
                             {{ $user->role->label() }}
                         </span>
-                        @if($user->department)
-                        <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
-                            {{ $user->department->name }}
-                        </span>
-                        @endif
+
                     </div>
 
                     {{-- Actions --}}

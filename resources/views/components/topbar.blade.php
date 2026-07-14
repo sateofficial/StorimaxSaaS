@@ -67,13 +67,15 @@
                         <div class="flex items-start gap-3">
                             @php
                             $notifIcon = match($notif->type) {
-                                'job_assigned'   => 'text-blue-500',
-                                'job_review'     => 'text-yellow-500',
-                                'job_done'       => 'text-green-500',
-                                'invoice_sent'   => 'text-blue-500',
-                                'invoice_paid'   => 'text-green-500',
+                                'job_assigned'     => 'text-blue-500',
+                                'job_todo'         => 'text-gray-500',
+                                'job_inprogress'   => 'text-sky-500',
+                                'job_review'       => 'text-yellow-500',
+                                'job_done'         => 'text-green-500',
+                                'invoice_sent'     => 'text-blue-500',
+                                'invoice_paid'     => 'text-green-500',
                                 'portfolio_published' => 'text-purple-500',
-                                default          => 'text-gray-500',
+                                default            => 'text-gray-500',
                             };
                             @endphp
                             <div class="flex-1 min-w-0">

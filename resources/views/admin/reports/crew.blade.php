@@ -22,7 +22,6 @@
         </div>
         <div>
             <h2 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h2>
-            <p class="text-sm text-gray-500">{{ $user->department?->name ?? 'Tanpa departemen' }}</p>
             <p class="text-sm text-gray-400">{{ $user->email }}</p>
         </div>
     </div>
@@ -85,7 +84,7 @@
 {{-- Job List --}}
 <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
     <div class="px-5 py-4 border-b border-gray-50">
-        <h3 class="text-sm font-semibold text-gray-900">Riwayat Job</h3>
+        <h3 class="text-sm font-medium text-gray-900">Riwayat Job</h3>
     </div>
 
     @if($jobs->isEmpty())

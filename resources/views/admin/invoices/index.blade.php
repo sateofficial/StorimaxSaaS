@@ -21,10 +21,12 @@
         </a>
         @endforeach
     </div>
+    @if(auth()->user()->isAdmin())
     <a href="{{ route('admin.invoices.create') }}"
        class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
         + Buat Invoice
     </a>
+    @endif
 </div>
 
 <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
@@ -64,7 +66,7 @@
                     </span>
                 </div>
                 <p class="text-xs text-gray-400 mt-1">
-                    {{ $invoice->client->contact_name }} · {{ $invoice->project->name }}
+                    {{ optional($invoice->client)->contact_name ?? '—' }} · {{ $invoice->project?->name ?? '—' }}
                     · {{ $invoice->invoice_date->format('d M Y') }}
                 </p>
             </div>
@@ -81,6 +83,7 @@
             <div class="flex items-center gap-3 flex-shrink-0">
                 <a href="{{ route('admin.invoices.pdf', $invoice) }}"
                    class="text-xs text-gray-400 hover:text-gray-700 transition">PDF</a>
+                @if(auth()->user()->isAdmin())
                 <form method="POST" action="{{ route('admin.invoices.destroy', $invoice) }}"
                       onsubmit="return confirm('Hapus invoice ini?')">
                     @csrf
@@ -89,6 +92,7 @@
                         Hapus
                     </button>
                 </form>
+                @endif
             </div>
         </div>
         @endforeach

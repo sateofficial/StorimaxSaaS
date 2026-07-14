@@ -37,7 +37,7 @@
                     </span>
                 </div>
                 <p class="text-xs text-gray-400 mt-1">
-                    {{ $invoice->project->name }} · {{ $invoice->invoice_date->format('d M Y') }}
+                    {{ $invoice->project?->name ?? '—' }} · {{ $invoice->invoice_date->format('d M Y') }}
                 </p>
             </div>
             <div class="text-right flex-shrink-0">

@@ -22,6 +22,20 @@ class Client extends Model
         'notes',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (self $client) {
+            // Cascade soft-delete: projects (→ jobs → invoices → portfolios)
+            foreach ($client->projects as $project) {
+                $project->delete(); // Project cascade akan handle jobs, invoices, portfolios
+            }
+            // Hapus user login terkait
+            if ($client->user) {
+                $client->user->delete();
+            }
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

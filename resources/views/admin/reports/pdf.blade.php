@@ -57,7 +57,6 @@
         <thead>
             <tr>
                 <th>Crew</th>
-                <th>Departemen</th>
                 <th class="text-center">Total</th>
                 <th class="text-center">To Do</th>
                 <th class="text-center">Progress</th>
@@ -70,7 +69,6 @@
             @forelse($crewMembers as $crew)
             <tr>
                 <td class="bold">{{ $crew->name }}</td>
-                <td>{{ $crew->department?->name ?? '-' }}</td>
                 <td class="text-center">{{ $crew->jobs_count }}</td>
                 <td class="text-center">{{ $crew->todo_count }}</td>
                 <td class="text-center">{{ $crew->inprogress_count }}</td>
@@ -80,7 +78,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="8" class="text-center" style="color: #999; padding: 20px;">
+                <td colspan="7" class="text-center" style="color: #999; padding: 20px;">
                     Belum ada data crew.
                 </td>
             </tr>

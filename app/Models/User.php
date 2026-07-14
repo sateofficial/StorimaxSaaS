@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,7 +16,6 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'department_id',
         'name',
         'email',
         'password',
@@ -43,10 +41,6 @@ class User extends Authenticatable
     }
 
     // ── Relasi ────────────────────────────────────────────
-    public function department(): BelongsTo
-    {
-        return $this->belongsTo(Department::class);
-    }
 
     public function client(): HasOne
     {
@@ -71,16 +65,6 @@ class User extends Authenticatable
     public function activityLogs(): HasMany
     {
         return $this->hasMany(ActivityLog::class);
-    }
-
-    public function teamMemberships(): HasMany
-    {
-        return $this->hasMany(ProjectTeamMember::class);
-    }
-
-    public function picTeams(): HasMany
-    {
-        return $this->hasMany(ProjectTeam::class, 'pic_user_id');
     }
 
     // ── Helper role ───────────────────────────────────────

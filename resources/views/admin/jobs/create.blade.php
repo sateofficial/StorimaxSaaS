@@ -22,35 +22,21 @@
                 @error('title') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Tim</label>
-                    <select name="project_team_id"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
-                                   focus:outline-none focus:ring-2 focus:ring-gray-900">
-                        <option value="">Tanpa tim</option>
-                        @foreach($teams as $team)
-                        <option value="{{ $team->id }}"
-                                {{ old('project_team_id') === $team->id ? 'selected' : '' }}>
-                            {{ $team->team_name }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Assign ke Crew</label>
-                    <select name="assigned_to"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
-                                   focus:outline-none focus:ring-2 focus:ring-gray-900">
-                        <option value="">Belum diassign</option>
-                        @foreach($crews as $crew)
-                        <option value="{{ $crew->id }}"
-                                {{ old('assigned_to') === $crew->id ? 'selected' : '' }}>
-                            {{ $crew->name }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">
+                    Assign ke Crew
+                </label>
+                <select name="assigned_to"
+                        class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
+                               focus:outline-none focus:ring-2 focus:ring-gray-900">
+                    <option value="">Belum diassign</option>
+                    @foreach($crews as $crew)
+                    <option value="{{ $crew->id }}"
+                            {{ old('assigned_to') === $crew->id ? 'selected' : '' }}>
+                        {{ $crew->name }}
+                    </option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -83,6 +69,15 @@
                           placeholder="Detail pekerjaan, brief singkat..."
                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
                                  focus:outline-none focus:ring-2 focus:ring-gray-900 resize-none">{{ old('description') }}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Link Google Drive</label>
+                <input type="url" name="gdrive_link" value="{{ old('gdrive_link') }}"
+                       placeholder="https://drive.google.com/file/d/..."
+                       class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
+                              focus:outline-none focus:ring-2 focus:ring-gray-900">
+                <p class="text-xs text-gray-400 mt-1">Link ke file hasil pekerjaan (diisi oleh admin)</p>
             </div>
 
             <div>

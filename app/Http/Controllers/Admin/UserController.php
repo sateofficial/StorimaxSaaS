@@ -4,44 +4,39 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('department')
-            ->whereNotIn('role', [UserRole::CLIENT])
+        $users = User::whereNotIn('role', [UserRole::CLIENT])
             ->latest()
             ->get();
 
-        $departments = Department::all();
-
-        return view('admin.users.index', compact('users', 'departments'));
+        return view('admin.users.index', compact('users'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name'          => 'required|string|max:150',
-            'email'         => 'required|email|unique:users,email',
-            'password'      => 'required|min:8',
-            'role'          => 'required|in:admin,atasan,crew',
-            'department_id' => 'nullable|exists:departments,id',
-            'phone'         => 'nullable|string|max:20',
+            'name'     => 'required|string|max:150',
+            'email'    => ['required', 'email', Rule::unique('users', 'email')->whereNull('deleted_at')],
+            'password' => 'required|min:8',
+            'role'     => 'required|in:admin,atasan,crew',
+            'phone'    => 'nullable|string|max:20',
         ]);
 
         User::create([
-            'name'          => $request->name,
-            'email'         => $request->email,
-            'password'      => Hash::make($request->password),
-            'role'          => $request->role,
-            'department_id' => $request->department_id,
-            'phone'         => $request->phone,
-            'is_active'     => true,
+            'name'      => $request->name,
+            'email'     => $request->email,
+            'password'  => Hash::make($request->password),
+            'role'      => $request->role,
+            'phone'     => $request->phone,
+            'is_active' => true,
         ]);
 
         return back()->with('success', 'User berhasil ditambahkan.');
@@ -49,27 +44,24 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $departments = Department::all();
-        return view('admin.users.edit', compact('user', 'departments'));
+        return view('admin.users.edit', compact('user'));
     }
 
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name'          => 'required|string|max:150',
-            'email'         => 'required|email|unique:users,email,' . $user->id,
-            'role'          => 'required|in:admin,atasan,crew',
-            'department_id' => 'nullable|exists:departments,id',
-            'phone'         => 'nullable|string|max:20',
-            'password'      => 'nullable|min:8',
+            'name'     => 'required|string|max:150',
+            'email'    => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)->whereNull('deleted_at')],
+            'role'     => 'required|in:admin,atasan,crew',
+            'phone'    => 'nullable|string|max:20',
+            'password' => 'nullable|min:8',
         ]);
 
         $data = [
-            'name'          => $request->name,
-            'email'         => $request->email,
-            'role'          => $request->role,
-            'department_id' => $request->department_id,
-            'phone'         => $request->phone,
+            'name'  => $request->name,
+            'email' => $request->email,
+            'role'  => $request->role,
+            'phone' => $request->phone,
         ];
 
         if ($request->filled('password')) {

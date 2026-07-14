@@ -60,9 +60,6 @@
                 </a>
                 <p class="text-xs text-gray-400 mt-0.5">
                     {{ $job->project->name }}
-                    @if($job->team)
-                    · {{ $job->team->team_name }}
-                    @endif
                 </p>
             </div>
             <span class="text-xs px-2 py-0.5 rounded-full font-medium flex-shrink-0 {{ $statusColor }}">

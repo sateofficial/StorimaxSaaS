@@ -11,8 +11,6 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Job;
 use App\Models\Project;
-use App\Models\ProjectTeam;
-use App\Models\ProjectTeamMember;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -51,51 +49,39 @@ class DummyDataSeeder extends Seeder
                 'notes'       => 'Budget terbatas tapi prioritas tinggi karena potensi repeat order.',
             ]);
 
-            // Team
-            $team2 = ProjectTeam::create([
-                'project_id' => $p2->id,
-                'team_name'  => 'Kreatif',
-                'pic_user_id'=> $sari->id,
-            ]);
-            ProjectTeamMember::create(['project_team_id' => $team2->id, 'user_id' => $sari->id]);
-            ProjectTeamMember::create(['project_team_id' => $team2->id, 'user_id' => $andi->id]);
-
             // Jobs
             Job::create([
-                'project_id'      => $p2->id,
-                'project_team_id' => $team2->id,
-                'assigned_to'     => $andi->id,
-                'created_by'      => $admin->id,
-                'title'           => 'Desain Logo UMKM',
-                'description'    => 'Buat 3 opsi logo untuk UMKM binaan dengan tema lokal.',
-                'status'         => JobStatus::DONE,
-                'priority'       => JobPriority::HIGH,
-                'deadline'       => now()->addDays(5),
-                'started_at'     => now()->subDays(3),
-                'completed_at'   => now()->subDay(),
+                'project_id'  => $p2->id,
+                'assigned_to' => $andi->id,
+                'created_by'  => $admin->id,
+                'title'       => 'Desain Logo UMKM',
+                'description' => 'Buat 3 opsi logo untuk UMKM binaan dengan tema lokal.',
+                'status'      => JobStatus::DONE,
+                'priority'    => JobPriority::HIGH,
+                'deadline'    => now()->addDays(5),
+                'started_at'  => now()->subDays(3),
+                'completed_at'=> now()->subDay(),
             ]);
             Job::create([
-                'project_id'      => $p2->id,
-                'project_team_id' => $team2->id,
-                'assigned_to'     => $sari->id,
-                'created_by'      => $admin->id,
-                'title'           => 'Konten Feed Instagram (10 slide)',
-                'description'    => 'Buat konten feed Instagram untuk 2 minggu: 5 edukasi, 3 promosi, 2 testimonials.',
-                'status'         => JobStatus::INPROGRESS,
-                'priority'       => JobPriority::MEDIUM,
-                'deadline'       => now()->addDays(10),
-                'started_at'     => now()->subDay(),
+                'project_id'  => $p2->id,
+                'assigned_to' => $sari->id,
+                'created_by'  => $admin->id,
+                'title'       => 'Konten Feed Instagram (10 slide)',
+                'description' => 'Buat konten feed Instagram untuk 2 minggu: 5 edukasi, 3 promosi, 2 testimonials.',
+                'status'      => JobStatus::INPROGRESS,
+                'priority'    => JobPriority::MEDIUM,
+                'deadline'    => now()->addDays(10),
+                'started_at'  => now()->subDay(),
             ]);
             Job::create([
-                'project_id'      => $p2->id,
-                'project_team_id' => $team2->id,
-                'assigned_to'     => $andi->id,
-                'created_by'      => $admin->id,
-                'title'           => 'Video Reels Promosi 15 detik',
-                'description'    => 'Buat 3 video reels untuk IG/TikTok promosi UMKM.',
-                'status'         => JobStatus::TODO,
-                'priority'       => JobPriority::MEDIUM,
-                'deadline'       => now()->addDays(14),
+                'project_id'  => $p2->id,
+                'assigned_to' => $andi->id,
+                'created_by'  => $admin->id,
+                'title'       => 'Video Reels Promosi 15 detik',
+                'description' => 'Buat 3 video reels untuk IG/TikTok promosi UMKM.',
+                'status'      => JobStatus::TODO,
+                'priority'    => JobPriority::MEDIUM,
+                'deadline'    => now()->addDays(14),
             ]);
 
             // Invoice
@@ -150,60 +136,41 @@ class DummyDataSeeder extends Seeder
                 'notes'       => 'H-3, mohon dikejar. Client request tambahan slideshow.',
             ]);
 
-            // Team
-            $team3a = ProjectTeam::create([
-                'project_id'  => $p3->id,
-                'team_name'   => 'Produksi',
-                'pic_user_id' => $budi->id,
-            ]);
-            ProjectTeamMember::create(['project_team_id' => $team3a->id, 'user_id' => $budi->id]);
-            ProjectTeamMember::create(['project_team_id' => $team3a->id, 'user_id' => $sari->id]);
-
-            $team3b = ProjectTeam::create([
-                'project_id'  => $p3->id,
-                'team_name'   => 'Pasca Produksi',
-                'pic_user_id' => $andi->id,
-            ]);
-            ProjectTeamMember::create(['project_team_id' => $team3b->id, 'user_id' => $andi->id]);
-
             // Jobs
             Job::create([
-                'project_id'      => $p3->id,
-                'project_team_id' => $team3a->id,
-                'assigned_to'     => $budi->id,
-                'created_by'      => $admin->id,
-                'title'           => 'Setup Camera & Lighting',
-                'description'    => 'Siapkan 3 camera Sony A7IV + lighting portable untuk venue indoor.',
-                'status'         => JobStatus::DONE,
-                'priority'       => JobPriority::URGENT,
-                'deadline'       => now()->addDays(2),
-                'started_at'     => now()->subDays(3),
-                'completed_at'   => now()->subDays(2),
+                'project_id'  => $p3->id,
+                'assigned_to' => $budi->id,
+                'created_by'  => $admin->id,
+                'title'       => 'Setup Camera & Lighting',
+                'description' => 'Siapkan 3 camera Sony A7IV + lighting portable untuk venue indoor.',
+                'status'      => JobStatus::DONE,
+                'priority'    => JobPriority::URGENT,
+                'deadline'    => now()->addDays(2),
+                'started_at'  => now()->subDays(3),
+                'completed_at'=> now()->subDays(2),
             ]);
             Job::create([
-                'project_id'      => $p3->id,
-                'project_team_id' => $team3a->id,
-                'assigned_to'     => $sari->id,
-                'created_by'      => $admin->id,
-                'title'           => 'Live Streaming OBS Setup',
-                'description'    => 'Setup OBS untuk multi-camera switching + stream ke YouTube.',
-                'status'         => JobStatus::DONE,
-                'priority'       => JobPriority::URGENT,
-                'deadline'       => now()->addDays(1),
-                'started_at'     => now()->subDays(3),
-                'completed_at'   => now()->subDay(),
+                'project_id'  => $p3->id,
+                'assigned_to' => $sari->id,
+                'created_by'  => $admin->id,
+                'title'       => 'Live Streaming OBS Setup',
+                'description' => 'Setup OBS untuk multi-camera switching + stream ke YouTube.',
+                'status'      => JobStatus::DONE,
+                'priority'    => JobPriority::URGENT,
+                'deadline'    => now()->addDays(1),
+                'started_at'  => now()->subDays(3),
+                'completed_at'=> now()->subDay(),
             ]);
             Job::create([
-                'project_id'      => $p3->id,
-                'project_team_id' => $team3b->id,
-                'assigned_to'     => $andi->id,
-                'created_by'      => $admin->id,
-                'title'           => 'Edit Highlight Wedding 3-5 Menit',
-                'description'    => 'Rangkuman momen penting dalam video 3-5 menit dengan musik + color grading.',
-                'status'         => JobStatus::REVIEW,
-                'priority'       => JobPriority::HIGH,
-                'deadline'       => now()->addDays(5),
-                'started_at'     => now()->subDay(),
+                'project_id'  => $p3->id,
+                'assigned_to' => $andi->id,
+                'created_by'  => $admin->id,
+                'title'       => 'Edit Highlight Wedding 3-5 Menit',
+                'description' => 'Rangkuman momen penting dalam video 3-5 menit dengan musik + color grading.',
+                'status'      => JobStatus::REVIEW,
+                'priority'    => JobPriority::HIGH,
+                'deadline'    => now()->addDays(5),
+                'started_at'  => now()->subDay(),
             ]);
 
             // Invoice
@@ -267,27 +234,18 @@ class DummyDataSeeder extends Seeder
                 'deadline'    => now()->subDays(5),
             ]);
 
-            // Team
-            $team4 = ProjectTeam::create([
-                'project_id'  => $p4->id,
-                'team_name'   => 'Fotografi',
-                'pic_user_id' => $budi->id,
-            ]);
-            ProjectTeamMember::create(['project_team_id' => $team4->id, 'user_id' => $budi->id]);
-
             // Jobs
             Job::create([
-                'project_id'      => $p4->id,
-                'project_team_id' => $team4->id,
-                'assigned_to'     => $budi->id,
-                'created_by'      => $admin->id,
-                'title'           => 'Foto 50 item produk',
-                'description'    => 'Flat lay + model shot untuk 50 item fashion.',
-                'status'         => JobStatus::DONE,
-                'priority'       => JobPriority::MEDIUM,
-                'deadline'       => now()->subDays(7),
-                'started_at'     => now()->subDays(14),
-                'completed_at'   => now()->subDays(6),
+                'project_id'  => $p4->id,
+                'assigned_to' => $budi->id,
+                'created_by'  => $admin->id,
+                'title'       => 'Foto 50 item produk',
+                'description' => 'Flat lay + model shot untuk 50 item fashion.',
+                'status'      => JobStatus::DONE,
+                'priority'    => JobPriority::MEDIUM,
+                'deadline'    => now()->subDays(7),
+                'started_at'  => now()->subDays(14),
+                'completed_at'=> now()->subDays(6),
             ]);
 
             // Invoice

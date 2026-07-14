@@ -77,12 +77,12 @@
                         : null;
 
                     $statusColor = match($project->status->value) {
-                        'active'   => 'bg-blue-50 text-blue-700',
-                        'review'   => 'bg-yellow-50 text-yellow-700',
-                        'done'     => 'bg-green-50 text-green-700',
-                        'draft'    => 'bg-gray-100 text-gray-600',
-                        'archived' => 'bg-red-50 text-red-600',
-                        default    => 'bg-gray-100 text-gray-600',
+                        'active'   => 'bg-blue-50 text-blue-700 border border-blue-200',
+                        'review'   => 'bg-yellow-50 text-yellow-700 border border-yellow-200',
+                        'done'     => 'bg-green-50 text-green-700 border border-green-200',
+                        'draft'    => 'bg-gray-100 text-gray-600 border border-gray-200',
+                        'archived' => 'bg-red-50 text-red-600 border border-red-200',
+                        default    => 'bg-gray-100 text-gray-600 border border-gray-200',
                     };
                 @endphp
                 <a href="{{ route('admin.projects.show', $project) }}"
@@ -105,7 +105,8 @@
                                     {{ $project->client?->company ?? $project->client?->contact_name ?? '—' }}
                                 </span>
                             </div>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium flex-shrink-0 {{ $statusColor }}">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold flex-shrink-0 {{ $statusColor }}">
+                                <span class="w-1.5 h-1.5 rounded-full" style="background:currentColor"></span>
                                 {{ $project->status->label() }}
                             </span>
                             @if($project->deadline)

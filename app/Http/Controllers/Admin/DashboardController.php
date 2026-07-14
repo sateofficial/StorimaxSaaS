@@ -32,6 +32,10 @@ class DashboardController extends Controller
         $sort = request('sort', 'progress_desc');
 
         // Projects with job progress
+        // ── Filter logic ──
+        // ACTIVE & REVIEW: selalu tampil (masih dikerjakan)
+        // DONE: tampil hanya jika masih dalam deadline (belum melewati batas waktu)
+        // DONE + deadline terlewat: sembunyi (sudah selesai, tidak perlu dimonitor)
         $projects = Project::with('client')
             ->withCount([
                 'jobs',
@@ -39,7 +43,16 @@ class DashboardController extends Controller
                     $q->where('status', JobStatus::DONE);
                 },
             ])
-            ->whereIn('status', [ProjectStatus::ACTIVE, ProjectStatus::REVIEW, ProjectStatus::DONE])
+            ->where(function ($q) {
+                $q->whereIn('status', [ProjectStatus::ACTIVE, ProjectStatus::REVIEW]);
+                $q->orWhere(function ($q2) {
+                    $q2->where('status', ProjectStatus::DONE)
+                        ->where(function ($q3) {
+                            $q3->whereNull('deadline')
+                               ->orWhere('deadline', '>=', now());
+                        });
+                });
+            })
             ->latest('updated_at')
             ->take(10)
             ->get()

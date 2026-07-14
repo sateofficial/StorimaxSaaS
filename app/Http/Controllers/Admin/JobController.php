@@ -16,7 +16,7 @@ class JobController extends Controller
 {
     public function index()
     {
-        $jobs = Job::with(['project.client', 'assignee', 'team'])
+        $jobs = Job::with(['project.client', 'assignee'])
             ->latest()
             ->get();
 
@@ -30,34 +30,32 @@ class JobController extends Controller
                      ->orderBy('name')
                      ->get();
 
-        $teams = $project->teams()->get();
-
-        return view('admin.jobs.create', compact('project', 'crews', 'teams'));
+        return view('admin.jobs.create', compact('project', 'crews'));
     }
 
     public function store(Request $request, Project $project)
     {
         $request->validate([
-            'title'           => 'required|string|max:200',
-            'description'     => 'nullable|string',
-            'project_team_id' => 'nullable|exists:project_teams,id',
-            'assigned_to'     => 'nullable|exists:users,id',
-            'priority'        => 'required|in:low,medium,high,urgent',
-            'deadline'        => 'nullable|date',
-            'notes'           => 'nullable|string',
+            'title'       => 'required|string|max:200',
+            'description' => 'nullable|string',
+            'assigned_to' => 'nullable|exists:users,id',
+            'priority'    => 'required|in:low,medium,high,urgent',
+            'deadline'    => 'nullable|date',
+            'notes'       => 'nullable|string',
+            'gdrive_link' => 'nullable|string|max:500',
         ]);
 
         $job = Job::create([
-            'project_id'      => $project->id,
-            'project_team_id' => $request->project_team_id ?: null,
-            'assigned_to'     => $request->assigned_to ?: null,
-            'created_by'      => auth()->id(),
-            'title'           => $request->title,
-            'description'     => $request->description,
-            'status'          => JobStatus::TODO,
-            'priority'        => $request->priority,
-            'deadline'        => $request->deadline,
-            'notes'           => $request->notes,
+            'project_id'  => $project->id,
+            'assigned_to' => $request->assigned_to ?: null,
+            'created_by'  => auth()->id(),
+            'title'       => $request->title,
+            'description' => $request->description,
+            'status'      => JobStatus::TODO,
+            'priority'    => $request->priority,
+            'deadline'    => $request->deadline,
+            'notes'       => $request->notes,
+            'gdrive_link' => $request->gdrive_link,
         ]);
 
         // Notifikasi ke crew yang diassign
@@ -81,9 +79,7 @@ class JobController extends Controller
         $job->load([
             'project.client',
             'assignee',
-            'team',
             'logs.user',
-            'attachments.uploader',
             'creator',
         ]);
 
@@ -97,26 +93,24 @@ class JobController extends Controller
                      ->orderBy('name')
                      ->get();
 
-        $teams = $job->project->teams()->get();
-
-        return view('admin.jobs.edit', compact('job', 'crews', 'teams'));
+        return view('admin.jobs.edit', compact('job', 'crews'));
     }
 
     public function update(Request $request, Job $job)
     {
         $request->validate([
-            'title'           => 'required|string|max:200',
-            'description'     => 'nullable|string',
-            'project_team_id' => 'nullable|exists:project_teams,id',
-            'assigned_to'     => 'nullable|exists:users,id',
-            'priority'        => 'required|in:low,medium,high,urgent',
-            'deadline'        => 'nullable|date',
-            'notes'           => 'nullable|string',
+            'title'       => 'required|string|max:200',
+            'description' => 'nullable|string',
+            'assigned_to' => 'nullable|exists:users,id',
+            'priority'    => 'required|in:low,medium,high,urgent',
+            'deadline'    => 'nullable|date',
+            'notes'       => 'nullable|string',
+            'gdrive_link' => 'nullable|string|max:500',
         ]);
 
         $job->update($request->only([
-            'title', 'description', 'project_team_id',
-            'assigned_to', 'priority', 'deadline', 'notes',
+            'title', 'description', 'assigned_to',
+            'priority', 'deadline', 'notes', 'gdrive_link',
         ]));
 
         return redirect()->route('admin.jobs.show', $job)
@@ -128,7 +122,12 @@ class JobController extends Controller
         $project = $job->project;
         $job->delete();
 
-        return redirect()->route('admin.projects.show', $project)
+        if ($project) {
+            return redirect()->route('admin.projects.show', $project)
+                ->with('success', 'Job berhasil dihapus.');
+        }
+
+        return redirect()->route('admin.jobs.index')
             ->with('success', 'Job berhasil dihapus.');
     }
 

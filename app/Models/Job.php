@@ -16,7 +16,6 @@ class Job extends Model
 
     protected $fillable = [
         'project_id',
-        'project_team_id',
         'assigned_to',
         'created_by',
         'title',
@@ -27,6 +26,7 @@ class Job extends Model
         'started_at',
         'completed_at',
         'notes',
+        'gdrive_link',
     ];
 
     protected function casts(): array
@@ -45,10 +45,7 @@ class Job extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function team(): BelongsTo
-    {
-        return $this->belongsTo(ProjectTeam::class, 'project_team_id');
-    }
+    // ── team() removed — fitur tim/PIC dihapus
 
     public function assignee(): BelongsTo
     {

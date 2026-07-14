@@ -74,7 +74,7 @@
                 </div>
                 <div class="flex items-center gap-3 mt-1">
                     <span class="text-xs text-gray-400">
-                        {{ $job->project->name }}
+                        {{ $job->project?->name ?? '—' }}
                     </span>
                     <span class="text-xs text-gray-300">·</span>
                     <span class="text-xs text-gray-400">
@@ -92,6 +92,7 @@
             <div class="flex items-center gap-3 flex-shrink-0">
                 <a href="{{ route('admin.jobs.show', $job) }}"
                    class="text-xs text-gray-400 hover:text-gray-700 transition">Detail</a>
+                @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.jobs.edit', $job) }}"
                    class="text-xs text-gray-400 hover:text-gray-700 transition">Edit</a>
                 <form method="POST" action="{{ route('admin.jobs.destroy', $job) }}"
@@ -102,6 +103,7 @@
                         Hapus
                     </button>
                 </form>
+                @endif
             </div>
         </div>
         @endforeach

@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class ClientController extends Controller
 {
@@ -21,7 +22,7 @@ class ClientController extends Controller
     {
         $request->validate([
             'contact_name' => 'required|string|max:150',
-            'email'        => 'required|email|unique:users,email',
+            'email'        => ['required', 'email', Rule::unique('users', 'email')->whereNull('deleted_at')],
             'password'     => 'required|min:8',
             'company_name' => 'nullable|string|max:150',
             'phone'        => 'nullable|string|max:20',
@@ -56,21 +57,33 @@ class ClientController extends Controller
 
     public function update(Request $request, Client $client)
     {
-        $request->validate([
+        $rules = [
             'contact_name' => 'required|string|max:150',
+            'email'        => ['required', 'email', Rule::unique('users', 'email')->ignore($client->user_id)->whereNull('deleted_at')],
+            'password'     => 'nullable|min:8',
             'company_name' => 'nullable|string|max:150',
             'phone'        => 'nullable|string|max:20',
             'instagram'    => 'nullable|string|max:100',
             'address'      => 'nullable|string',
             'notes'        => 'nullable|string',
-        ]);
+        ];
+
+        $request->validate($rules);
 
         $client->update($request->only([
             'contact_name', 'company_name',
             'phone', 'instagram', 'address', 'notes',
         ]));
 
-        $client->user->update(['name' => $request->contact_name]);
+        // Update akun login
+        $userData = [
+            'name'  => $request->contact_name,
+            'email' => $request->email,
+        ];
+        if ($request->filled('password')) {
+            $userData['password'] = Hash::make($request->password);
+        }
+        $client->user->update($userData);
 
         return redirect()->route('admin.clients.index')
             ->with('success', 'Client berhasil diupdate.');
@@ -78,13 +91,9 @@ class ClientController extends Controller
 
     public function destroy(Client $client)
     {
-        if ($client->projects()->count() > 0) {
-            return back()->with('error', 'Client tidak bisa dihapus karena masih memiliki project.');
-        }
-
-        $client->user->delete();
+        // Cascade delete: project (→ jobs → invoices → portfolios) + user login
         $client->delete();
 
-        return back()->with('success', 'Client berhasil dihapus.');
+        return back()->with('success', 'Client beserta seluruh data terkait berhasil dihapus.');
     }
 }

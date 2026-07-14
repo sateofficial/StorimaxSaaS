@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Crew;
 use App\Helpers\NotificationHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Job;
-use App\Models\JobAttachment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ProgressController extends Controller
 {
@@ -19,7 +17,7 @@ class ProgressController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:todo,inprogress,review,done',
+            'status' => 'required|in:inprogress,review,done',
             'note'   => 'nullable|string|max:500',
         ]);
 
@@ -44,68 +42,39 @@ class ProgressController extends Controller
             'note'       => $request->note,
         ]);
 
-        // Notifikasi ke admin saat crew update ke review/done
-        if (in_array($newStatus, ['review', 'done'])) {
-            $statusLabel = match($newStatus) {
-                'review' => 'Review',
-                'done'   => 'Done',
-                default  => ucfirst($newStatus),
-            };
-            NotificationHelper::notifyAdmins(
+        // ── Notifikasi ke Admin & Atasan ──
+        // Kirim untuk SEMUA perubahan status agar progress terpantau
+        $statusLabel = match($newStatus) {
+            'inprogress' => 'In Progress',
+            'review'     => 'Review',
+            'done'       => 'Done',
+            'todo'       => 'To Do',
+            default      => ucfirst($newStatus),
+        };
+
+        $crewName = auth()->user()->name;
+
+        NotificationHelper::notifyAdmins(
+            type: 'job_' . $newStatus,
+            title: "Job {$statusLabel}: {$job->title}",
+            message: "{$crewName} mengupdate job \"{$job->title}\" menjadi {$statusLabel}.",
+            data: ['job_id' => $job->id, 'project_id' => $job->project_id],
+            actionUrl: route('admin.jobs.show', $job),
+        );
+
+        // ── Notifikasi ke Client ──
+        $client = optional($job->project)->client;
+        if ($client && $client->user_id) {
+            NotificationHelper::notify(
+                userId: $client->user_id,
                 type: 'job_' . $newStatus,
-                title: "Job {$statusLabel}: {$job->title}",
-                message: auth()->user()->name . " mengupdate job \"{$job->title}\" menjadi {$statusLabel}.",
+                title: "Update Progress: {$job->title}",
+                message: "Progress job \"{$job->title}\" di project \"" . ($job->project?->name ?? '—') . "\" berubah menjadi {$statusLabel}.",
                 data: ['job_id' => $job->id, 'project_id' => $job->project_id],
-                actionUrl: route('admin.jobs.show', $job),
+                actionUrl: route('client.dashboard'),
             );
         }
 
         return back()->with('success', 'Status job berhasil diupdate.');
-    }
-
-    public function uploadAttachment(Request $request, Job $job)
-    {
-        if ($job->assigned_to !== auth()->id()) {
-            abort(403, 'Kamu tidak memiliki akses ke job ini.');
-        }
-
-        $request->validate([
-            'file'        => 'required|file|max:10240', // max 10MB
-            'category'    => 'nullable|string|max:50',
-            'description' => 'nullable|string|max:500',
-        ]);
-
-        $file = $request->file('file');
-        $path = $file->store('job-attachments', 'public');
-
-        $job->attachments()->create([
-            'uploaded_by' => auth()->id(),
-            'file_name'   => $file->getClientOriginalName(),
-            'file_path'   => $path,
-            'file_type'   => $file->getMimeType(),
-            'file_size'   => $file->getSize(),
-            'category'    => $request->category,
-            'description' => $request->description,
-        ]);
-
-        return back()->with('success', 'File berhasil diupload.');
-    }
-
-    public function deleteAttachment(Job $job, JobAttachment $attachment)
-    {
-        if ($job->assigned_to !== auth()->id()) {
-            abort(403, 'Kamu tidak memiliki akses ke job ini.');
-        }
-
-        if ($attachment->job_id !== $job->id) {
-            abort(404);
-        }
-
-        // Hapus file dari storage
-        Storage::disk('public')->delete($attachment->file_path);
-
-        $attachment->delete();
-
-        return back()->with('success', 'File berhasil dihapus.');
     }
 }

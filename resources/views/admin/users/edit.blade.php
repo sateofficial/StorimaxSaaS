@@ -49,20 +49,7 @@
                 </select>
             </div>
 
-            <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Department</label>
-                <select name="department_id"
-                        class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
-                               focus:outline-none focus:ring-2 focus:ring-gray-900">
-                    <option value="">Tanpa department</option>
-                    @foreach($departments as $dept)
-                    <option value="{{ $dept->id }}"
-                            {{ old('department_id', $user->department_id) === $dept->id ? 'selected' : '' }}>
-                        {{ $dept->name }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
+
 
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">No. Telepon</label>

@@ -74,12 +74,8 @@
                 </div>
                 <div class="flex items-center gap-3 mt-1">
                     <span class="text-xs text-gray-400">
-                        {{ $job->project->name }}
+                        {{ $job->project?->name ?? '—' }}
                     </span>
-                    @if($job->team)
-                    <span class="text-xs text-gray-300">·</span>
-                    <span class="text-xs text-gray-400">{{ $job->team->team_name }}</span>
-                    @endif
                     @if($job->deadline)
                     <span class="text-xs text-gray-300">·</span>
                     <span class="text-xs {{ $job->isOverdue() ? 'text-red-500' : 'text-gray-400' }}">

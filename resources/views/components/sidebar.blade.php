@@ -33,6 +33,24 @@
         {{-- Admin & Atasan menu --}}
         @if(in_array($role, ['admin', 'atasan']))
 
+            {{-- Master Data — selalu di atas (hanya admin) --}}
+            @if($role === 'admin')
+            <div class="pt-3 pb-1 px-2">
+                <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Manajemen</span>
+            </div>
+
+            <x-ui.nav-item
+                href="{{ route('admin.users.index') }}"
+                icon="users"
+                label="Users"
+            />
+            <x-ui.nav-item
+                href="{{ route('admin.clients.index') }}"
+                icon="briefcase"
+                label="Clients"
+            />
+            @endif
+
             <div class="pt-3 pb-1 px-2">
                 <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Project</span>
             </div>
@@ -42,7 +60,6 @@
                 icon="folder"
                 label="Projects"
             />
-            {{-- Jobs diarahkan ke projects dulu sampai modul jobs selesai --}}
             <x-ui.nav-item
             href="{{ route('admin.jobs.index') }}"
             icon="check-square"
@@ -73,28 +90,6 @@
                 icon="bar-chart"
                 label="Laporan"
             />
-
-            @if($role === 'admin')
-            <div class="pt-3 pb-1 px-2">
-                <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Manajemen</span>
-            </div>
-
-            <x-ui.nav-item
-                href="{{ route('admin.users.index') }}"
-                icon="users"
-                label="Users"
-            />
-            <x-ui.nav-item
-                href="{{ route('admin.clients.index') }}"
-                icon="briefcase"
-                label="Clients"
-            />
-            <x-ui.nav-item
-                href="{{ route('admin.departments.index') }}"
-                icon="layers"
-                label="Departments"
-            />
-            @endif
 
         @endif
 
@@ -137,18 +132,23 @@
 
     {{-- User info --}}
 @auth
-<div class="border-t border-gray-100 p-3">
+<a href="{{ route('profile.show') }}" class="block border-t border-gray-100 p-3 hover:bg-gray-50 transition group">
     <div class="flex items-center gap-3 px-2 py-2 rounded-lg">
-        <div class="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0">
+        <div class="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            @if(auth()->user()->avatar)
+            <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
+                 alt="" class="w-full h-full object-cover">
+            @else
             <span class="text-xs font-medium text-white">
                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
             </span>
+            @endif
         </div>
         <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->name }}</p>
+            <p class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 transition">{{ auth()->user()->name }}</p>
             <p class="text-xs text-gray-400 truncate">{{ auth()->user()->role->label() }}</p>
         </div>
     </div>
-</div>
+</a>
 @endauth
 </aside>

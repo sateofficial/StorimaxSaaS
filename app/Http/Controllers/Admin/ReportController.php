@@ -7,7 +7,6 @@ use App\Enums\InvoiceStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Models\Department;
 use App\Models\Invoice;
 use App\Models\Job;
 use App\Models\Project;
@@ -38,8 +37,7 @@ class ReportController extends Controller
         ])->count();
 
         // ── Performa per Crew ────────────────────────────
-        $crewMembers = User::with('department')
-            ->where('role', UserRole::CREW)
+        $crewMembers = User::where('role', UserRole::CREW)
             ->where('is_active', true)
             ->withCount([
                 'jobs',
@@ -56,13 +54,9 @@ class ReportController extends Controller
                 return $crew;
             });
 
-        // ── Departemen ───────────────────────────────────
-        $departments = Department::withCount(['users' => fn($q) => $q->where('role', UserRole::CREW)])
-            ->get();
-
         return view('admin.reports.index', compact(
             'totalCrew', 'activeProjects', 'totalJobs', 'completionRate',
-            'pendingInvoices', 'crewMembers', 'departments'
+            'pendingInvoices', 'crewMembers'
         ));
     }
 
@@ -78,13 +72,13 @@ class ReportController extends Controller
             ->get();
 
         $stats = [
-            'total'     => $jobs->count(),
-            'todo'      => $jobs->where('status', JobStatus::TODO)->count(),
-            'inprogress'=> $jobs->where('status', JobStatus::INPROGRESS)->count(),
-            'review'    => $jobs->where('status', JobStatus::REVIEW)->count(),
-            'done'      => $jobs->where('status', JobStatus::DONE)->count(),
-            'overdue'   => $jobs->filter(fn($j) => $j->isOverdue())->count(),
-            'rate'      => $jobs->count() > 0
+            'total'      => $jobs->count(),
+            'todo'       => $jobs->where('status', JobStatus::TODO)->count(),
+            'inprogress' => $jobs->where('status', JobStatus::INPROGRESS)->count(),
+            'review'     => $jobs->where('status', JobStatus::REVIEW)->count(),
+            'done'       => $jobs->where('status', JobStatus::DONE)->count(),
+            'overdue'    => $jobs->filter(fn($j) => $j->isOverdue())->count(),
+            'rate'       => $jobs->count() > 0
                 ? round(($jobs->where('status', JobStatus::DONE)->count() / $jobs->count()) * 100)
                 : 0,
         ];
@@ -94,8 +88,7 @@ class ReportController extends Controller
 
     public function exportPdf()
     {
-        $crewMembers = User::with('department')
-            ->where('role', UserRole::CREW)
+        $crewMembers = User::where('role', UserRole::CREW)
             ->where('is_active', true)
             ->withCount([
                 'jobs',
@@ -125,8 +118,7 @@ class ReportController extends Controller
 
     public function exportExcel()
     {
-        $crewMembers = User::with('department')
-            ->where('role', UserRole::CREW)
+        $crewMembers = User::where('role', UserRole::CREW)
             ->where('is_active', true)
             ->withCount([
                 'jobs',
@@ -158,14 +150,13 @@ class ReportController extends Controller
 
             // Header
             fputcsv($handle, [
-                'Nama', 'Departemen', 'Total Job', 'To Do',
+                'Nama', 'Total Job', 'To Do',
                 'In Progress', 'Review', 'Done', 'Completion Rate',
             ]);
 
             foreach ($crewMembers as $crew) {
                 fputcsv($handle, [
                     $crew->name,
-                    $crew->department?->name ?? '-',
                     $crew->jobs_count,
                     $crew->todo_count,
                     $crew->inprogress_count,

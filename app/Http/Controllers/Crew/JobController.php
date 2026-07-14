@@ -9,7 +9,7 @@ class JobController extends Controller
 {
     public function index()
     {
-        $jobs = Job::with(['project.client', 'team'])
+        $jobs = Job::with('project.client')
             ->where('assigned_to', auth()->id())
             ->latest()
             ->get();
@@ -26,9 +26,7 @@ class JobController extends Controller
 
         $job->load([
             'project.client',
-            'team',
             'logs.user',
-            'attachments.uploader',
         ]);
 
         return view('crew.jobs.show', compact('job'));

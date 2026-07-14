@@ -2,7 +2,7 @@
 
 @section('title', $job->title)
 @section('header', $job->title)
-@section('subheader', $job->project->name . ' · ' . ($job->team?->team_name ?? 'Tanpa tim'))
+@section('subheader', $job->project?->name ?? '—')
 
 @section('content')
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -16,36 +16,28 @@
             {{-- Status --}}
             <div>
                 <p class="text-xs text-gray-400 mb-2">Status</p>
-                <form method="POST" action="{{ route('crew.jobs.update-status', $job) }}">
-                    @csrf
-                    @method('PATCH')
-                    <select name="status" onchange="this.form.submit()"
-                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
-                                   focus:outline-none focus:ring-2 focus:ring-gray-900">
-                        @foreach(['todo', 'inprogress', 'review', 'done'] as $s)
-                        <option value="{{ $s }}" {{ $job->status->value === $s ? 'selected' : '' }}>
-                            {{ match($s) {
-                                'todo'       => 'To Do',
-                                'inprogress' => 'In Progress',
-                                'review'     => 'Review',
-                                'done'       => 'Done',
-                                default      => ucfirst($s)
-                            } }}
-                        </option>
-                        @endforeach
-                    </select>
-                </form>
+                <span class="text-sm font-medium text-gray-900">{{ $job->status->label() }}</span>
             </div>
+
+            @if($job->gdrive_link)
+            <div class="pt-2">
+                <p class="text-xs text-gray-400 mb-1">Link Google Drive</p>
+                <a href="{{ $job->gdrive_link }}" target="_blank"
+                   class="text-sm text-blue-600 hover:underline inline-flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                    Lihat File
+                </a>
+            </div>
+            @endif
 
             {{-- Detail info --}}
             <div class="space-y-3 pt-2 border-t border-gray-50">
                 <div>
                     <p class="text-xs text-gray-400">Project</p>
-                    <p class="text-sm text-gray-900">{{ $job->project->name }}</p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-400">Tim</p>
-                    <p class="text-sm text-gray-900">{{ $job->team?->team_name ?? '—' }}</p>
+                    <p class="text-sm text-gray-900">{{ $job->project?->name ?? '—' }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-gray-400">Prioritas</p>
@@ -90,7 +82,7 @@
             @endif
         </div>
 
-        {{-- Update Status dengan Catatan --}}
+        {{-- Update Status --}}
         <div class="bg-white rounded-xl border border-gray-100 p-5">
             <h3 class="text-sm font-medium text-gray-900 mb-3">Update Status</h3>
             <form method="POST" action="{{ route('crew.jobs.update-status', $job) }}"
@@ -113,44 +105,13 @@
                     @endforeach
                 </select>
                 <textarea name="note" rows="3"
-                          placeholder="Catatan perubahan status (opsional)..."
+                          placeholder="Catatan (opsional)..."
                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
                                  focus:outline-none focus:ring-2 focus:ring-gray-900 resize-none"></textarea>
                 <button type="submit"
                         class="w-full py-2 bg-gray-900 text-white text-sm font-medium rounded-lg
                                hover:bg-gray-700 transition">
-                    Update
-                </button>
-            </form>
-        </div>
-
-        {{-- Upload Attachment --}}
-        <div class="bg-white rounded-xl border border-gray-100 p-5">
-            <h3 class="text-sm font-medium text-gray-900 mb-3">Upload File</h3>
-            <form method="POST" action="{{ route('crew.jobs.attachments.upload', $job) }}"
-                  enctype="multipart/form-data" class="space-y-3">
-                @csrf
-                <div>
-                    <input type="file" name="file"
-                           class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-                                  file:rounded-lg file:border-0 file:text-sm file:font-medium
-                                  file:bg-gray-900 file:text-white hover:file:bg-gray-700
-                                  file:cursor-pointer file:transition">
-                </div>
-                <div>
-                    <input type="text" name="category" placeholder="Kategori (opsional)"
-                           class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
-                                  focus:outline-none focus:ring-2 focus:ring-gray-900">
-                </div>
-                <div>
-                    <textarea name="description" rows="2" placeholder="Deskripsi file (opsional)..."
-                              class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg
-                                     focus:outline-none focus:ring-2 focus:ring-gray-900 resize-none"></textarea>
-                </div>
-                <button type="submit"
-                        class="w-full py-2 bg-gray-900 text-white text-sm font-medium rounded-lg
-                               hover:bg-gray-700 transition">
-                    Upload
+                    Update Status
                 </button>
             </form>
         </div>
@@ -221,62 +182,7 @@
             @endif
         </div>
 
-        {{-- Attachments --}}
-        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-100">
-                <h3 class="text-sm font-medium text-gray-900">
-                    File Terlampir
-                    <span class="ml-2 text-xs text-gray-400 font-normal">
-                        {{ $job->attachments->count() }} file
-                    </span>
-                </h3>
-            </div>
 
-            @if($job->attachments->isEmpty())
-            <div class="py-10 text-center text-sm text-gray-400">
-                Belum ada file yang diupload.
-            </div>
-            @else
-            <div class="divide-y divide-gray-50">
-                @foreach($job->attachments as $attachment)
-                <div class="px-5 py-3 flex items-center justify-between gap-3">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">
-                            {{ $attachment->file_name }}
-                        </p>
-                        <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-xs text-gray-400">{{ $attachment->file_size_human }}</span>
-                            @if($attachment->category)
-                            <span class="text-xs text-gray-300">·</span>
-                            <span class="text-xs text-gray-400">{{ $attachment->category }}</span>
-                            @endif
-                            @if($attachment->description)
-                            <span class="text-xs text-gray-300">·</span>
-                            <span class="text-xs text-gray-400">{{ $attachment->description }}</span>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank"
-                           class="text-xs text-gray-400 hover:text-gray-700 transition">
-                            Lihat
-                        </a>
-                        <form method="POST"
-                              action="{{ route('crew.jobs.attachments.delete', [$job, $attachment]) }}"
-                              onsubmit="return confirm('Hapus file ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                    class="text-xs text-red-400 hover:text-red-600 transition">
-                                Hapus
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-            @endif
-        </div>
 
     </div>
 

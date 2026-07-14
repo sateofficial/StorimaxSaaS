@@ -2,7 +2,7 @@
 
 @section('title', $portfolio->title)
 @section('header', $portfolio->title)
-@section('subheader', $portfolio->project->name . ' · ' . $portfolio->project->code)
+@section('subheader', $portfolio->project ? $portfolio->project->name . ' · ' . $portfolio->project->code : '—')
 
 @section('content')
 
@@ -59,15 +59,19 @@
     <div class="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
         <div>
             <p class="text-xs text-gray-400 mb-1">Project</p>
+            @if($portfolio->project)
             <a href="{{ route('admin.projects.show', $portfolio->project) }}"
                class="text-sm text-blue-600 hover:underline">
                 {{ $portfolio->project->name }}
             </a>
+            @else
+            <span class="text-sm text-gray-400">—</span>
+            @endif
         </div>
 
         <div>
             <p class="text-xs text-gray-400 mb-1">Client</p>
-            <p class="text-sm text-gray-900">{{ $portfolio->project->client->contact_name }}</p>
+            <p class="text-sm text-gray-900">{{ optional(optional($portfolio->project)->client)->contact_name ?? '—' }}</p>
         </div>
 
         <div>

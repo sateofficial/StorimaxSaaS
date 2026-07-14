@@ -108,7 +108,7 @@
                         </div>
                         <div class="min-w-0">
                             <p class="text-sm font-medium text-gray-900 truncate">{{ $client->contact_name }}</p>
-                            <p class="text-xs text-gray-400 truncate">{{ $client->user->email }}</p>
+                            <p class="text-xs text-gray-400 truncate">{{ $client->company_name ?? 'Client' }}</p>
                         </div>
                     </div>
 

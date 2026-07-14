@@ -20,10 +20,12 @@
         </a>
         @endforeach
     </div>
+    @if(auth()->user()->isAdmin())
     <a href="{{ route('admin.projects.create') }}"
        class="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">
         + Buat Project
     </a>
+    @endif
 </div>
 
 {{-- Project list --}}
@@ -116,16 +118,11 @@
                 </div>
             </div>
 
-            {{-- Tim count --}}
-            <div class="flex-shrink-0 text-center">
-                <p class="text-sm font-medium text-gray-900">{{ $project->teams->count() }}</p>
-                <p class="text-xs text-gray-400">tim</p>
-            </div>
-
             {{-- Actions --}}
             <div class="flex items-center gap-3 flex-shrink-0">
                 <a href="{{ route('admin.projects.show', $project) }}"
                    class="text-xs text-gray-400 hover:text-gray-700 transition">Detail</a>
+                @if(auth()->user()->isAdmin())
                 <a href="{{ route('admin.projects.edit', $project) }}"
                    class="text-xs text-gray-400 hover:text-gray-700 transition">Edit</a>
                 <form method="POST" action="{{ route('admin.projects.destroy', $project) }}"
@@ -136,6 +133,7 @@
                         Hapus
                     </button>
                 </form>
+                @endif
             </div>
 
         </div>
